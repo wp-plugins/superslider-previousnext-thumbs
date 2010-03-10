@@ -1,0 +1,105 @@
+/*
+Name: Sliding Pnext with mootools 1.2
+Author: daiv mowbray
+Author URI: http://wp-superslider.com/
+Date: feb 30, 2010
+Version: 1.0
+
+set to work with thumbnails of 80 x 80 px.
+
+	The CSS, XHTML and design is released under Creative Common License 3.0:
+	http://creativecommons.org/licenses/by-sa/3.0/
+
+*/ 
+
+
+#pnext-nav{
+    margin: 12px;
+}
+.nextpost_thumb
+{
+	left: 6px;
+	position: absolute;
+	padding: 4px;
+	background: #385b7c;
+	top: 6px;
+	z-index: 10;
+}
+.nextpost_thumb:hover{
+    background: #67A9E3;
+}
+.button_wrap
+{
+font-size:11px;
+height:150px;
+margin:6px;
+overflow:hidden;
+position:relative;
+width: 100px;
+}
+
+.pnext_tag_active{
+    height: 145px;
+}
+.pnext_tag_inactive{
+	height: 125px;   
+}
+.pnext_tag {
+	height: 125px;
+	width: 98px;
+	-moz-border-radius: 14px;
+	-moz-border-radius-topleft: 0px;
+	-moz-border-radius-topright: 0px;
+
+	-webkit-border-top-left-radius: 0px;
+	-webkit-border-top-right-radius: 0px;
+	-webkit-border-bottom-left-radius: 14px;
+	-webkit-border-bottom-right-radius: 14px;
+	background-color: #fff;
+	color: #000;
+	top: 0px;
+	right: 0px;
+	position: absolute;
+	border: 1px solid #67A9E3;
+}
+
+.pnext_tag span {
+	visibility: hidden;
+	color: #4a79a3;
+	left: 4px;
+	margin: 0 4px 4px 0px;
+	position: absolute;
+	top: 124px;
+	font-weight: bold;
+}
+
+.button_bLeft, .button_bRight {
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+background:#67A9E3 url(prev-next-arrow.png) no-repeat scroll 0 0;
+color:#000000;
+cursor:pointer;
+height:23px;
+line-height:23px;
+overflow:hidden;
+position:absolute;
+right:3px;
+text-align:center;
+top:100px;
+width:94px;
+}
+
+.button_bRight
+{
+	background: #67A9E3 url(prev-next-arrow.png) no-repeat 80px -20px ;
+}
+
+.button_bLeft span, .button_bRight span { color: #008ddd; }
+
+.button_c
+{
+	background-color: #4a79a3;
+	color: #fff;
+}
+
+.button_c span { color: #093d6f; }
