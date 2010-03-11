@@ -64,7 +64,7 @@ Download These SuperSlider Plugins here:
 
 == Installation ==
 
-* Unpack contents to wp-content/plugins/ into a **superslider-show** directory
+* Unpack contents to wp-content/plugins/ into a **superslider-previousnext-thumbs** directory
 * Activate the plugin,
 * Configure global settings for plugin under > settings > SuperSlider-Pnext
 * Add optional function call in your single.php file inside your site theme folder. (requires disabling the automatic insertion )
@@ -77,13 +77,13 @@ Download These SuperSlider Plugins here:
 
 If you are not sure how this plugin works you may want to read the following.
 
-* First ensure that you have uploaded all of the plugin files into wp-content/plugins/superslider-pnext folder.
-* Go to your WordPress admin panel and stop in to the plugins control page. Activate the SuperSlider-Pnext plugin.
+* First ensure that you have uploaded all of the plugin files into wp-content/plugins/superslider-previousnext-thumbs folder.
+* Go to your WordPress admin panel and stop in to the plugins control page. Activate the superslider-previousnext-thumbs plugin.
 * Default settings provide for Pnext nav at the end of your page.
 * Add optional function call in your single.php file inside your site theme folder.(you will need to deactivate the Automatic insertion.)
 * Basic function call: «$myssPnext->ss_previous_next_nav();«
 * Complete, recommended function call: 
-`<?php 
+«<?php 
     if(class_exists ('ssPnext') ) { 
        $myssPnext->ss_previous_next_nav();
     } else {
@@ -93,8 +93,7 @@ If you are not sure how this plugin works you may want to read the following.
 	       next_post_link('%link &raquo;');
 	echo '</div></div>';
     }
-?>`
-
+?>«
 
 == OPTIONS AND CONFIGURATIONS ==
 
@@ -126,7 +125,8 @@ Create your own graphic and animation theme based on one of these provided.
 
 == Frequently Asked Questions ==	
 
-
+* Please use the support system at http://support.wp-superslider.com
+there are no Faq's yet
 
 == Changelog ==
 
