@@ -86,9 +86,8 @@ If you are not sure how this plugin works you may want to read the following.
 * Default settings provide for Pnext nav at the end of your page.
 * Add optional function call in your single.php file inside your site theme folder.(you will need to deactivate the Automatic insertion.)
 * Basic function call: `$myssPnext->ss_previous_next_nav();`
-* Complete, recommended function call: 
-`<?php 
-    if(class_exists ('ssPnext') ) { 
+* Complete, recommended function call (to be put inside of php open and close tags): 
+`if(class_exists ('ssPnext') ) { 
        $myssPnext->ss_previous_next_nav();
     } else {
 	echo '<div class="navigation"> <div class="alignleft">';
@@ -96,8 +95,7 @@ If you are not sure how this plugin works you may want to read the following.
 	echo '</div><div class="alignright">';
 	       next_post_link('%link &raquo;');
 	echo '</div></div>';
-    }
-?>`
+    }`
 
 == OPTIONS AND CONFIGURATIONS ==
 
