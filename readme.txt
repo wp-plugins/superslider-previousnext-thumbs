@@ -1,7 +1,7 @@
 === Superslider-PreviousNext-Thumbs ===
 Contributors: Daiv Mowbray
 Plugin URI: http://wp-superslider.com/superslider/superslider-previousnext-thumbmnails
-http://wp-superslider.com/support-me/donate/
+Donate link: http://wp-superslider.com/support-me/donate/
 Tags: single post, previous, navigation, next, previous next, mootools 1.2, mootools, slider, superslider
 Requires at least: 2.6
 Tested up to: 2.9.2
@@ -72,6 +72,10 @@ Download These SuperSlider Plugins here:
 	under  > settings > SuperSlider-Pnext > option group, File Storage - Loading Options
 	select "Load css from plugin-data folder, see side note. (Recommended)". This will
 	prevent plugin uploads from over writing any css changes you may have made.
+
+== Upgrade Notice ==
+
+You may need to re-save your settings/ options when upgrading
 
 == USAGE ==
 
