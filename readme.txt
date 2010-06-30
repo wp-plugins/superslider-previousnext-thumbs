@@ -4,8 +4,8 @@ Plugin URI: http://wp-superslider.com/superslider/superslider-previousnext-thumb
 Donate link: http://wp-superslider.com/support-me/donate/
 Tags: single post, previous, navigation, next, previous next, mootools 1.2, mootools, slider, superslider
 Requires at least: 2.6
-Tested up to: 2.9.2
-Stable tag: 0.2
+Tested up to: 3.0
+Stable tag: 0.6
 
 Next, Previous post thumbnail navigation.
 
@@ -132,6 +132,23 @@ there are no Faq's yet
 
 == Changelog ==
 
+* 0.6 (2010/06/02)
+
+  * fixed link to settings page
+  * added save options upon deactivation option
+
+* 0.5 (2010/05/23 )
+
+  * Changed the media options page layout
+
+* 0.4 (2010/05/12)
+
+  * Fixed bug, thumb creation user options failed to save correctly.
+
+* 0.3 (2010/03/23)
+
+  * Fixed bug, where content was echoed, instead of returning it for further processing.
+  
 * 0.2 (2010/02/26)
 
   * Fixed various bugs

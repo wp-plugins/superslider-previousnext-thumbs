@@ -5,7 +5,7 @@ Plugin URI: http://wp-superslider.com/superslider/superslider-previousNext-thumb
 Description: A previous-next post, thumbnail navigation creator. Works specifically on the single post pages. Uses Mootools 1.2 javascript. 
 Author URI: http://wp-superslider.com
 Author: Daiv Mowbray
-Version: 0.2
+Version: 0.6
 
 
 */
@@ -109,7 +109,8 @@ if (!class_exists('ssPnext')) {
 				"num_ran"     => "2",
 				"make_thumb"   =>  "on",
 				"auto_insert"   =>  "on",
-				"pnext_location"   =>  "loop_end"
+				"pnext_location"   =>  "content_end",
+				'delete_options' => ''
 				);
 
 
@@ -145,8 +146,7 @@ if (!class_exists('ssPnext')) {
 					$this->base_over_ride = $this->ssBaseOpOut[ss_global_over_ride];
 				}else{
 				$this->base_over_ride = 'false';
-			}
-			
+			}			
 			// lets see if the ss-Show plugin is here
 			if (class_exists('ssShow')) {
 					$this->show_over_ride = 'true';
@@ -155,9 +155,7 @@ if (!class_exists('ssPnext')) {
 				}
 			
 			extract($this->PnextOptions);
-			    	   
-            //$this->language_switcher();
-            
+			    	               
             // remove_action( 'template', 'previous_post_link', 1 );
     	   // remove_action( 'template',  'next_post_link', 1 );
     	   
@@ -181,7 +179,6 @@ if (!class_exists('ssPnext')) {
              }
           
             wp_register_style('superslider_Pnext', $cssFile);
-
 
             if ( $morph_Pnext == 'on' ) {  			
                add_action ( 'wp_enqueue_scripts', array(&$this,'Pnext_add_javascript') );
@@ -207,12 +204,11 @@ if (!class_exists('ssPnext')) {
         include_once 'admin/superslider-pnext-ui.php';
     } 
     
-    function Pnext_admin_pages(){
-    
+    function Pnext_admin_pages(){    
         if (  function_exists('add_options_page') ) {
             if (  current_user_can('manage_options') ) {
                 if (!class_exists('ssBase')) $plugin_page = add_options_page(__('Superslider Pnext', 'superslider-Pnext'),__('SuperSlider-Pnext', 'superslider-Pnext'), 8, 'superslider-pnext', array(&$this, 'Pnext_ui'));
-                add_filter('plugin_action_links', array(&$this, 'filter_plugin_Pnext'), 10, 2 );	
+                add_filter('plugin_action_links_' . plugin_basename(__FILE__), array(&$this, 'filter_plugin_Pnext'), 10, 2 );	
                 
                 add_action ( 'admin_print_styles', array(&$this,'ssbox_admin_style'));
                 if (!class_exists('ssBase')) add_action('admin_print_scripts-'.$plugin_page, array(&$this,'Pnext_admin_script'));
@@ -227,7 +223,7 @@ if (!class_exists('ssPnext')) {
     * Add link to options page from plugin list.
     */
     function filter_plugin_Pnext($links, $file) {
-         static $this_plugin;
+        static $this_plugin;
             if (  ! $this_plugin ) $this_plugin = plugin_basename(__FILE__);
 
         if (  $file == $this_plugin )
@@ -239,16 +235,17 @@ if (!class_exists('ssPnext')) {
     *	remove options from DB upon deactivation
     */
     function Pnext_ops_deactivation(){		
-        delete_option($this->optionsName);
-        delete_option('prenext_size_w');
-        delete_option('prenext_size_h');
-        delete_option('prenext_crop');
+        if($this->PnextOpOut[delete_options] == true){
+            delete_option($this->optionsName);
+            delete_option('prenext_size_w');
+            delete_option('prenext_size_h');
+            delete_option('prenext_crop');
+        }
     }
 
     function Pnext_add_javascript(){
-    
-       extract($this->PnextOpOut);
-
+        $morph_Pnext = $this->PnextOpOut[morph_Pnext];
+        $load_moo = $this->PnextOpOut[load_moo];
        if ( (!is_admin()) && (function_exists('wp_enqueue_script')) && ( $morph_Pnext == 'on') && ( is_singular() )) {
             if ( ($this->base_over_ride != "on") && ($load_moo == 'on') ) {
                wp_enqueue_script('moocore');		
@@ -261,121 +258,79 @@ if (!class_exists('ssPnext')) {
     * Adds a link to the stylesheet in the header
     */
     function Pnext_add_css() {
-    
-        //extract($this->PnextOpOut);
-        $css_load = $this->PnextOpOut[css_load];
-         
+        $css_load = $this->PnextOpOut[css_load];         
          if ( ($css_load !== 'off') && (is_singular() ) ){
            
-            wp_enqueue_style( 'superslider_Pnext');
-          
+            wp_enqueue_style( 'superslider_Pnext');          
           }
     }
     
     function Pnext_starter(){
-    
-          //extract($this->PnextOpOut);
-
-   $mytrans = "Fx.Transitions.".$this->PnextOpOut[trans_type].".".$this->PnextOpOut[trans_typeout];
-                   
-        $mystarter = "
-        var pnext = $$('div.button_wrap');
-        pnext.each(function(movePnext, i) {
-        var pnextHit = movePnext.getElements('.slidebttn');
-        var pnextMove = movePnext.getElement('.pnext_tag');
-        var span = pnextMove.getElement('span');
-        var PnextMorph = new Fx.Morph(pnextMove, {
-                      unit: 'px',
-                      link: 'cancel',
-                      duration: ".$this->PnextOpOut[resize_dur].", 
-                      transition: ".$mytrans.",
-                      fps: 30
-        });
-        pnextHit.addEvents({
-            mouseenter: function(e) {  
-               PnextMorph.start('.pnext_tag_active');
-               span.fade('in');
-               pnextHit.addClass('button_c');
-               },
-            mouseleave: function(e) {          
-                PnextMorph.start('.pnext_tag_inactive');
-                span.fade('out');
-                pnextHit.removeClass('button_c');
-                }
-           });       
-        });";
-          
-    $starter .= "\n"."<script type=\"text/javascript\">\n";
-    $starter .= "\t"."// <![CDATA[\n";		
-    $starter .= "window.addEvent('domready', function() {
-                ".$mystarter."					
-                });\n";
-    $starter .= "\t".'// ]]>';
-    $starter .= "\n".'</script>'."\n";
-                        
-    echo $starter;
+       $mytrans = "Fx.Transitions.".$this->PnextOpOut[trans_type].".".$this->PnextOpOut[trans_typeout];
+                       
+            $mystarter = "
+            var pnext = $$('div.button_wrap'); pnext.each(function(movePnext, i) { var pnextHit = movePnext.getElements('.slidebttn'); var pnextMove = movePnext.getElement('.pnext_tag'); var span = pnextMove.getElement('span'); var PnextMorph = new Fx.Morph(pnextMove, { unit: 'px', link: 'cancel', duration: ".$this->PnextOpOut[resize_dur].", transition: ".$mytrans.", fps: 30
+            });
+            pnextHit.addEvents({
+                mouseenter: function(e) { PnextMorph.start('.pnext_tag_active'); span.fade('in'); pnextHit.addClass('button_c'); },
+                mouseleave: function(e) { PnextMorph.start('.pnext_tag_inactive'); span.fade('out'); pnextHit.removeClass('button_c'); }
+               });       
+            });";
+              
+        $starter .= "\n"."<script type=\"text/javascript\">\n";
+        $starter .= "\t"."// <![CDATA[\n";		
+        $starter .= "window.addEvent('domready', function() {
+                    ".$mystarter."					
+                    });\n";
+        $starter .= "\t".'// ]]>';
+        $starter .= "\n".'</script>'."\n";
+                            
+        echo $starter;
     
     }
 		
-    function Pnext() {
-        
+    function Pnext() {        
         $this->PnextOpOut = get_option($this->optionsName);
-    
-        //extract($this->PnextOpOut);
          
         register_activation_hook(__FILE__, array(&$this,'Pnext_init') ); //http://codex.wordpress.org/Function_Reference/register_activation_hook
         register_deactivation_hook( __FILE__, array(&$this,'Pnext_ops_deactivation') ); //http://codex.wordpress.org/Function_Reference/register_deactivation_hook
         
         add_action ( 'init', array(&$this,'Pnext_init' ) );			
-        add_action ( 'admin_menu', array(&$this,'Pnext_admin_pages'));
-        
-        add_action ( 'admin_init', array(&$this,'Pnext_create_thumbs' ) );
-        
+        add_action ( 'admin_menu', array(&$this,'Pnext_admin_pages'));        
+        add_action ( 'admin_init', array(&$this,'Pnext_create_thumbs' ) );        
 		add_action( 'admin_init', array(&$this, 'Pnext_create_media_page') );
     }
     
-    function Pnext_add_thumb_nav() {    	   
-    	   
-    	   //extract($this->PnextOpOut);
+    function Pnext_add_thumb_nav() {
     	   $pnext_location = $this->PnextOpOut[pnext_location];
     	   
-    	   if ( ( is_singular()) && ($pnext_location == 'content_before' || $pnext_location == 'content_after') ) {
-    	       
-    	       add_action ( 'the_content', array(&$this,"ss_previous_next_content")); 
-    	   
-    	   } elseif ( is_singular()) {
-    	       
-    	       add_action ( $pnext_location, array(&$this,"ss_previous_next_nav"));
-    	   
+    	   if ( ( is_singular()) && ($pnext_location == 'content_before' || $pnext_location == 'content_after') ) {    	       
+    	       add_action ( 'the_content', array(&$this,"ss_previous_next_content"));
+    	   } elseif ( is_singular()) {    	       
+    	       add_action ( $pnext_location, array(&$this,"ss_previous_next_nav"));    	   
     	   }
     	   
     	}
         // if location is above or below content
     function ss_previous_next_content($content = '') {
-        
-        //extract($this->PnextOpOut);
         $pnext_location = $this->PnextOpOut[pnext_location];
 
         switch($pnext_location) {
         
-        case 'content_before' :            
-                echo $this->ss_previous_next_nav();
-                echo $content;
-            break;
-            
-        case 'content_after' :            
-                echo $content;
-                echo $this->ss_previous_next_nav();
+        case 'content_before' :   
+                $content = $this->ss_previous_next_nav().$content;
+                return $content;
+            break;            
+        case 'content_after' :               
+                $content = $content.$this->ss_previous_next_nav();
+                return $content;
             break;  
 
         }
 
     }
-    /**
-    */
     
-    public function ss_previous_next_nav() {
-    
+    public function ss_previous_next_nav() {    
         extract($this->PnextOpOut); 
 
         $thumb_w = get_option($thumbsize.'_size_w');
@@ -403,8 +358,7 @@ if (!class_exists('ssPnext')) {
                $previous_next .=  $previous;
                }
 
-            if ($nextpost != null) {
-                
+            if ($nextpost != null) {                
                 $nextid = $nextpost->ID;   
               
                 $image = ssPnext::ss_get_prenext_image($nextid, 'next');
@@ -427,49 +381,43 @@ if (!class_exists('ssPnext')) {
 
     }
 
-    function ss_get_prenext_image ( $id, $prenext ) {
+    function ss_get_prenext_image ( $id, $prenext ) {          
+       extract($this->PnextOpOut);
+            
+            // check first for a post 2.9 post thumb setting
+        if ( function_exists( 'get_the_post_thumbnail' )) {         
+           $myid = get_post_thumbnail_id($id);
+           $image = wp_get_attachment_image_src($myid, $thumbsize );
            
-           extract($this->PnextOpOut);
-                
-                // check first for a post 2.9 post thumb setting
-            if ( function_exists( 'get_the_post_thumbnail' )) {
-             
-               $myid = get_post_thumbnail_id($id);
-
-               $image = wp_get_attachment_image_src($myid, $thumbsize );
-               
-               if ( $image ) {
-     
-               $image[3] = 'postthumbnail_'.$prenext;
-               return $image;
-               }
+           if ( $image ) { 
+            $image[3] = 'postthumbnail_'.$prenext;
+            return $image;
            }
-           
-                // check for any attachments as there is no post thumb         
-            if ( empty($image) ) {
-                
-                $attachments = get_children( array('post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image') );	//, 'order' => $order, 'orderby' => $orderby
-             }
+       }       
+            // check for any attachments as there is no post thumb         
+        if ( empty($image) ) {            
+            $attachments = get_children( array('post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image') );	//, 'order' => $order, 'orderby' => $orderby
+         }
+         
+        if ( !empty($attachments) ) {
+            foreach ( $attachments as $id => $attachment ) :    
+                $image = wp_get_attachment_image_src($id, $thumbsize ); 
+                $image[3] = 'attached_'.$prenext;
+             break;
+            endforeach;
              
-            if ( !empty($attachments) ) {
-                    foreach ( $attachments as $id => $attachment ) :    
-                        $image = wp_get_attachment_image_src($id, $thumbsize ); 
-                        $image[3] = 'attached_'.$prenext;
-                     break;
-                    endforeach;
-                 
-            } elseif ( empty($image) ) {
+        } elseif ( empty($image) ) {
 
-                // If no image in post use default image function 
-                // First we get the category
+            // If no image in post use default image function 
+            // First we get the category
             $cat = get_the_category($id);
             $cat = $cat[0];
             $cat = 'cat-'.$cat->slug;
 
             $image = ssPnext::Pnext_default_image($cat, $prenext);
-            }
-           
-           return $image;
+        }
+       
+       return $image;
     }
             //create substring of the title to the last space and add dots
     public function ss_Pnext_titles($title, $title_length) {
@@ -488,11 +436,9 @@ if (!class_exists('ssPnext')) {
       $title = $short . $dots;
       return $title;
     }
-    
  
     // no image in this post, lets get a default 
     function Pnext_default_image($cat, $prenext){        
-        
         extract($this->PnextOptions);	
         
         if ($css_load == 'default') {
@@ -514,8 +460,7 @@ if (!class_exists('ssPnext')) {
         return $image;
     }
 
-    function load_Pnext(){
-        
+    function load_Pnext(){        
        extract($this->PnextOptions);	
         
        if (!is_admin() && (is_singular() )){
@@ -528,8 +473,7 @@ if (!class_exists('ssPnext')) {
              add_action ( 'wp_print_scripts', array(&$this,'Pnext_add_javascript' ));
              add_action ( "wp_footer", array(&$this,"Pnext_starter"));
             }
-
-        }
+       }
     }
             
     function ssbox_admin_style(){
@@ -541,60 +485,24 @@ if (!class_exists('ssPnext')) {
         
     }
     
-    
-    /*
-     * @param string $id String for use in the 'id' attribute of tags.
- * @param string $title Title of the field.
- * @param string $callback Function that fills the field with the desired content. The function should echo its output.
- * @param string $page The type of settings page on which to show the field (general, reading, writing, ...).
- * @param string $section The section of the settingss page in which to show the box (default, ...).
- * @param array $args Additional argument
-   
-   
-   	//	add_settings_field($id,               $title,       $callback,                           $page,     $section = 'default', $args = array())
-		add_settings_field('mediatag_base', 'Media-Tags', 'mediatags_setting_permalink_proc', 'permalink', 'optional');
-
-   
-   $page = options-media.php
-   */
-    function Pnext_create_media_page() {
-    			
-    		register_setting( 'media', 'prenext_size_w' );
-    		register_setting( 'media', 'prenext_size_h' );
-    		register_setting( 'media', 'prenext_crop' );
-
-    			//add_settings_section($id, $title, $callback, $page)
-			add_settings_section('pnext_section', 'SuperSlider-PreviousNext Image Sizes', array(&$this, 'Pnext_media_section'), 'media');
-			
-			add_settings_field('prenext_size_w', 'PreNext Width', array(&$this, 'Pnext_media_w'), 'media', 'pnext_section');
-			add_settings_field('prenext_size_h', 'PreNext Height', array(&$this, 'Pnext_media_h'), 'media', 'pnext_section');
-			add_settings_field('prenext_crop', 'PreNext Crop', array(&$this, 'Pnext_media_crop'), 'media', 'pnext_section');
+    function Pnext_create_media_page() {    			
+        register_setting( 'media', 'prenext_size_w' );
+        register_setting( 'media', 'prenext_size_h' );
+        register_setting( 'media', 'prenext_crop' );
+        
+        add_settings_field('prenext_size_w', 'PreNext Thumb', array(&$this, 'Pnext_media_size'), 'media', 'default');
 
     }
-
-    function Pnext_media_section(){
-      $section = '<span class="description"> More image sizes added by your SuperSlider plugin. Adding prenext to the standard thumbnail, medium, and large sizes.</span>';        
-       echo $section;
-	}
    
-	function Pnext_media_w(){        
+	function Pnext_media_size(){        
         $Pnext_w = get_option ('prenext_size_w');
-        echo '<label for="Pnext_size_w">Width</label><input name="Pnext_size_w" id="Pnext_size_w" type="text" value="'. $Pnext_w.'" class="small-text" />'; 
-       
-	}
-	function Pnext_media_h(){
-        $Pnext_h = get_option('prenext_size_h');       
-        echo '<label for="Pnext_size_h">Height</label><input name="Pnext_size_h" id="Pnext_size_h" type="text" value="'. $Pnext_h.'" class="small-text" />
-        <br />';
-	}
-	function Pnext_media_crop(){
+        $Pnext_h = get_option('prenext_size_h');    
         $Pnext_crop = get_option('prenext_crop');
-          echo '<input type="checkbox"'; 
+        echo '<label for="prenext_size_w">'.__(' Max Width ', 'superslider-previousNext-thumbs').'</label><input name="prenext_size_w" id="prenext_size_w" type="text" value="'. $Pnext_w.'" class="small-text" /> 
+        <label for="prenext_size_h">'.__(' Max Height ', 'superslider-previousNext-thumbs').'</label><input name="prenext_size_h" id="prenext_size_h" type="text" value="'. $Pnext_h.'" class="small-text" />
+        <br /><input type="checkbox"'; 
             checked('1', $Pnext_crop);        
-          echo ' value="1" id="Pnext_crop" name="Pnext_crop">
-            <label for="Pnext_crop">';
-            _e('Crop PreNext image to exact dimensions (normally thumbnails are proportional)'); 
-          echo '</label>';	
+        echo ' value="1" id="prenext_crop" name="prenext_crop"><label for="Pnext_crop">'.__(' Crop PreNext image to exact dimensions', 'superslider-previousNext-thumbs').'</label>';	
 	}
 	
 	/*
@@ -602,30 +510,24 @@ if (!class_exists('ssPnext')) {
 	*
 	*/
 	function Pnext_create_thumbs(){
-			extract($this->PnextOptions);
-			//if ($make_thumb == 'on') {
-			    $this->listnewimages();
-			
-			    add_filter( 'intermediate_image_sizes',  array(&$this, 'additional_thumb_sizes') );			
-			//}
-
+        $this->listnewimages();
+        add_filter( 'intermediate_image_sizes',  array(&$this, 'additional_thumb_sizes') );			
 	}
 	
 	function additional_thumb_sizes( $sizes ) {
-			$sizes[] = "prenext";
-			return $sizes;
+        $sizes[] = "prenext";
+        return $sizes;
 	}
 
 	function listnewimages() { 		
-	   extract($this->PnextOptions);	
+	    extract($this->PnextOptions);	
         
         if ($thumb_crop == true) { $crop = 1; }else { $crop = 0;}
-		if( FALSE == get_option('prenext_size_w') )
-			{	
+		if( FALSE == get_option('prenext_size_w') ) {	
 				add_option('prenext_size_w', $thumb_w );
 				add_option('prenext_size_h', $thumb_h);
 				add_option('prenext_crop', $crop);
-			}			
+		}			
 	}
 
     }// end class Pnext

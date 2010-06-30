@@ -51,7 +51,8 @@ $Pnext_domain = 'superslider-Pnext';
 				"num_ran"     => "2",
 				"make_thumb"   =>  "on",
 				"auto_insert"   =>  "on",
-				"pnext_location"   =>  "loop_end"
+				"pnext_location"   =>  "loop_end",
+				'delete_options' => ''
 				);
 
 			update_option('ssPnext_options', $Pnext_OldOptions);
@@ -87,7 +88,8 @@ $Pnext_domain = 'superslider-Pnext';
 				'num_ran'	    => $_POST["op_num_ran"],
 				'make_thumb'	=> $_POST["op_make_thumb"],
 				'auto_insert'	=> $_POST["op_auto_insert"],
-				'pnext_location'=> $_POST["op_pnext_location"]
+				'pnext_location'=> $_POST["op_pnext_location"],
+				'delete_options'	=> $_POST["op_delete_options"]
 			);	
 
 		update_option('ssPnext_options', $Pnext_newOptions);
@@ -229,8 +231,6 @@ jQuery(document).ready(function(){
 	<li style="border-bottom:1px solid #cdcdcd; padding: 6px 0px 8px 0px;">	
 	<label for="op_pnext_location"><?php _e(' Pnext placement on your page.',$Pnext_domain); ?></label>
 		<select name="op_pnext_location" id="op_pnext_location">
-			 <option <?php if($Pnext_newOptions['pnext_location'] == "loop_start") echo $selected; ?> id="loop_start" value='loop_start'> At the top of page</option>
-			 <option <?php if($Pnext_newOptions['pnext_location'] == "loop_end") echo $selected; ?> id="loop_end" value='loop_end'> At the end of page</option>
 			  <option <?php if($Pnext_newOptions['pnext_location'] == "content_before") echo $selected; ?> id="content_before" value='content_before'> before content</option>
 			  <option <?php if($Pnext_newOptions['pnext_location'] == "content_after") echo $selected; ?> id="content_after" value='content_after'> after content</option>
 		<!--the_content, the_posts, comment_form, -->
@@ -457,7 +457,13 @@ jQuery(document).ready(function(){
 		<?php _e(' If your theme or any other plugin loads the mootools 1.2 javascript framework into your file header, you can de-activate it here.',$Pnext_domain); ?></p><p><?php _e(' Via ftp, move the folder named plugin-data from this plugin folder into your wp-content folder. This is recomended to avoid over writing any changes you make to the css files when you update this plugin.',$Pnext_domain); ?></p></td>
 	</div><!-- close frag 8 -->
 </div><!--  close tabs -->
-
+<p>
+<label for="op_delete_options">
+		      <input type="checkbox" <?php if($Pnext_newOptions['delete_options'] == "on") echo $checked; ?> name="op_delete_options" id="op_delete_options" />
+		      <?php _e('Remove options. '); ?></label>	
+		 <br /><span class="setting-description"><?php _e('Select to have the plugin options removed from the data base upon deactivation.'); ?></span>
+		 <br />
+</p>
 <p class="submit">
 		<input type="submit" name="set_defaults" value="<?php _e(' Reload Default Options',$Pnext_domain); ?> &raquo;" />
 		<input type="submit" id="update2" class="button-primary" value="<?php _e(' Update options',$Pnext_domain); ?> &raquo;" />
