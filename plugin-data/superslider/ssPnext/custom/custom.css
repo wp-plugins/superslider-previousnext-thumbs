@@ -1,9 +1,9 @@
 /*
-Name: Sliding Pnext with mootools 1.2
+Name: Sliding Pnext 
 Author: daiv mowbray
-Author URI: http://wp-superslider.com/
-Date: feb 30, 2010
-Version: 1.0
+Author URI: http://superslider.daivmowbray.com/
+Date: march 27, 2012
+Version: 2.0
 
 	The CSS, XHTML and design is released under Creative Common License 3.0:
 	http://creativecommons.org/licenses/by-sa/3.0/
@@ -45,23 +45,21 @@ width:200px;
 .pnext_tag {
 	height: 76px;
 	width: 200px;
-/*	-moz-border-radius: 14px;
+	-moz-border-radius: 14px;
 	-moz-border-radius-topleft: 0px;
 	-moz-border-radius-topright: 0px;
 
 	-webkit-border-top-left-radius: 0px;
 	-webkit-border-top-right-radius: 0px;
 	-webkit-border-bottom-left-radius: 14px;
-	-webkit-border-bottom-right-radius: 14px;*/
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
+	-webkit-border-bottom-right-radius: 14px;
+
 	background-color: #c2a367;
 	color: #fff;
 	bottom: 0px;
 	right: 0px;
 	position: absolute;
 }
-
 .pnext_tag span {
 	visibility: hidden;
 	color: #FFF;
@@ -88,17 +86,13 @@ width:200px;
 	overflow: hidden;
 }
 
-.button_bRight
-{
+.button_bRight{
 	background: #fbd285 url(prev-next-arrow.png) no-repeat 182px -20px ;
 }
-
 .button_bLeft span, .button_bRight span { color: #008ddd; }
 
-.button_c
-{
+.button_c{
 	background-color: #fff;
 	color: #000;
 }
-
 .button_c span { color: #093d6f; }

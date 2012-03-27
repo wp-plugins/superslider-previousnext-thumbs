@@ -1,16 +1,16 @@
 <?php
 /**
 Plugin Name: SuperSlider-PreviousNext-Thumbs
-Plugin URI: http://wp-superslider.com/superslider/superslider-previousNext-thumbs
-Description: A previous-next post, thumbnail navigation creator. Works specifically on the single post pages. Uses Mootools 1.2 javascript. 
-Author URI: http://wp-superslider.com
+Plugin URI: http://superslider.daivmowbray.com/superslider/superslider-previousNext-thumbs
+Description: A previous-next post, thumbnail navigation creator. Works specifically on the single post pages. Uses Mootools 1.4 javascript. 
+Author URI: http://www.daivmowbray.com
 Author: Daiv Mowbray
-Version: 0.6
+Version: 2.0
 
 
 */
 
-/*  Copyright 2008  Daiv Mowbray  (email : daiv.mowbray@gmail.com)
+/*  Copyright 2011  Daiv Mowbray  (email : daiv.mowbray@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -110,7 +110,10 @@ if (!class_exists('ssPnext')) {
 				"make_thumb"   =>  "on",
 				"auto_insert"   =>  "on",
 				"pnext_location"   =>  "content_end",
-				'delete_options' => ''
+				"text_length" => "120",
+                "text_type" => "",
+                "short_replace" => "(shortcode)",
+				'delete_options' => ""
 				);
 
 
@@ -161,24 +164,29 @@ if (!class_exists('ssPnext')) {
     	   
             $this->js_path = WP_CONTENT_URL . '/plugins/'. plugin_basename(dirname(__FILE__) ) . '/js/';
 			
-  			wp_register_script('moocore', $this->js_path.'mootools-1.2.3-core-yc.js', NULL, '1.2.3');
+  			wp_register_script('moocore', $this->js_path.'mootools-core-1.4.1-full-compat-yc.js', NULL, '1.4.1');
 			
-			wp_register_script( 'moomore', $this->js_path. 'mootools-1.2.3.1-more.js', array( 'moocore' ), '1.2.3');
+			wp_register_script( 'moomore', $this->js_path. 'mootools-more-1.4.0.1.js', array( 'moocore' ), '1.4.0.1');
 			
 			if ( (class_exists('ssBase')) && ($this->ssBaseOpOut['ss_global_over_ride']) ) { extract($this->ssBaseOpOut); }
 
-            if ($css_load == 'default') {
-                    $cssFile = WP_PLUGIN_URL.'/superslider-previousnext-thumbs/plugin-data/superslider/ssPnext/'.$css_theme.'/'.$css_theme.'.css';
-    
-                } elseif ($css_load == 'pluginData') {
-                    $cssFile = WP_CONTENT_URL.'/plugin-data/superslider/ssPnext/'.$css_theme.'/'.$css_theme.'.css';
-     
-                }elseif ($css_load == 'off') {
-                    $cssFile = '';
-                    
-             }
-          
+            switch ($css_load) {
+            case 'default':
+                $cssFile = WP_PLUGIN_URL.'/superslider-previousnext-thumbs/plugin-data/superslider/ssPnext/'.$css_theme.'/'.$css_theme.'.css';
+                break;
+            case 'pluginData':
+                $cssFile = WP_CONTENT_URL.'/plugin-data/superslider/ssPnext/'.$css_theme.'/'.$css_theme.'.css';
+                break;
+            case 'theme':
+                $cssFile = get_stylesheet_directory_uri().'/plugin-data/superslider/ssPnext/'.$css_theme.'/'.$css_theme.'.css';
+                break;
+            case 'off':
+                $cssFile = '';
+                break;
+            }
+        
             wp_register_style('superslider_Pnext', $cssFile);
+            
 
             if ( $morph_Pnext == 'on' ) {  			
                add_action ( 'wp_enqueue_scripts', array(&$this,'Pnext_add_javascript') );
@@ -302,35 +310,39 @@ if (!class_exists('ssPnext')) {
     }
     
     function Pnext_add_thumb_nav() {
-    	   $pnext_location = $this->PnextOpOut[pnext_location];
-    	   
-    	   if ( ( is_singular()) && ($pnext_location == 'content_before' || $pnext_location == 'content_after') ) {    	       
-    	       add_action ( 'the_content', array(&$this,"ss_previous_next_content"));
-    	   } elseif ( is_singular()) {    	       
-    	       add_action ( $pnext_location, array(&$this,"ss_previous_next_nav"));    	   
+    	   $auto_insert = $this->PnextOpOut[auto_insert];
+ 
+    	   if ( ( is_singular()) && ($auto_insert == 'on') ) {    	       
+    	       add_filter ( 'the_content', array(&$this,"ss_previous_next_content"));
+    	   } elseif ( is_singular()) { 
+    	       add_filter ( $pnext_location, array(&$this,"ss_previous_next_nav"));  
     	   }
     	   
     	}
         // if location is above or below content
     function ss_previous_next_content($content = '') {
-        $pnext_location = $this->PnextOpOut[pnext_location];
+        $pnext_location = $this->PnextOpOut[pnext_location];	
+        $noecho = true;
 
         switch($pnext_location) {
-        
-        case 'content_before' :   
-                $content = $this->ss_previous_next_nav().$content;
-                return $content;
-            break;            
-        case 'content_after' :               
-                $content = $content.$this->ss_previous_next_nav();
+        case 'content_after' :                         
+                $content .= $this->ss_previous_next_nav($noecho);
                 return $content;
             break;  
-
+        case 'content_before' :   
+                $content = $this->ss_previous_next_nav($noecho) . $content;
+                return $content;
+            break;
+        case 'content_before_after' :
+                $thumbs = $this->ss_previous_next_nav($noecho);
+                $content = $thumbs . $content . $thumbs;
+                return $content;
+            break;
         }
 
     }
     
-    public function ss_previous_next_nav() {    
+    public function ss_previous_next_nav($noecho) {    
         extract($this->PnextOpOut); 
 
         $thumb_w = get_option($thumbsize.'_size_w');
@@ -339,46 +351,58 @@ if (!class_exists('ssPnext')) {
         $previouspost = get_previous_post($post_in_cat, $excluded_categories);
         $nextpost = get_next_post($post_in_cat, $excluded_categories);
 
-        if ($previouspost != null || $nextpost != null ) $previous_next = '<div id="pnext-nav" class="navigation">';
+        if ($previouspost != null || $nextpost != null ) $previous_next = '<div id="pnext-nav" class="navigation"><br style="clear:both;" />';
                   
              if ($previouspost != null) {
-             
+          
                $preid = $previouspost->ID;
-              
+               if ($text_type == 'content') { $ptext = $previouspost->post_content; }
+                elseif ($text_type == 'excerpt') {$ptext = $previouspost->post_excerpt; }             
+               
                $image = ssPnext::ss_get_prenext_image($preid, 'previous');
                $title = ssPnext::ss_Pnext_titles($previouspost->post_title, $title_length);
+               if($text_type != '')$ptext = ssPnext::ss_Pnext_text($ptext, $text_length, $short_replace);
+               
                $link = get_permalink($preid);
 
                $previous  = '<div class="button_wrap nav_previous alignleft"><a href="'.$link.'" class="slidebttn">';
-               $previous .= '<img class=" nextpost_thumb '.$image[3].'" src="' . $image[0] . '" alt="' . $title . '" width="' . $thumb_w . '" height="' . $thumb_h . '" />';
-               $previous .= '</a><br />
+               $previous .= '<img class=" nextpost_thumb '.$image[3].'" src="' . $image[0] . '" alt="' . $title . '" width="' . $thumb_w . '" height="' . $thumb_h . '" /></a><br />';
+               if(($text_type != '') && ($ptext !=''))$previous .= '<p>'.$ptext.'</p>';
+               $previous .= '
                     <div class="pnext_tag" id="pnext_tag1"><span>'.$previous_text.'</span></div>
                     <a class="button_bLeft slidebttn" title="'.$previouspost->post_title.'" id="button_bLeft" href="'.$link.'">'.$title.'</a>
                     </div>';
                $previous_next .=  $previous;
                }
 
-            if ($nextpost != null) {                
+            if ($nextpost != null) {  
+                
                 $nextid = $nextpost->ID;   
-              
+                if ($text_type == 'content') { $ntext = $nextpost->post_content; }
+                elseif ($text_type == 'excerpt') {$ntext = $nextpost->post_excerpt; }
                 $image = ssPnext::ss_get_prenext_image($nextid, 'next');
                 $title = ssPnext::ss_Pnext_titles($nextpost->post_title, $title_length);
+                if($text_type != '')$ntext = ssPnext::ss_Pnext_text($ntext, $text_length, $short_replace);
                 $link = get_permalink($nextid);
 
                 $next = '<div class="button_wrap nav_next alignright"><a href="'.$link.'" class="slidebttn">';
-                $next .= '<img class=" nextpost_thumb '.$image[3].'" src="' . $image[0] . '" alt="' . $title . '" width="'.$thumb_w.'" height="'.$thumb_h.'" />';
-                $next .= '</a><br />
+                $next .= '<img class=" nextpost_thumb '.$image[3].'" src="' . $image[0] . '" alt="' . $title . '" width="'.$thumb_w.'" height="'.$thumb_h.'" /></a><br />';
+                if(($text_type != '') && ($ntext !=''))$next .= '<p>'.$ntext.'</p>';
+                $next .= '
                     <div class="pnext_tag" id="pnext_tag2"><span>'.$next_text.'</span></div>
                     <a class="button_bRight slidebttn" title="'.$nextpost->post_title.'" id="button_bRight" href="'.$link.'">'.$title.'</a>
-                    </div>';
+                    </div><!-- close pnext-nav -->';
                $previous_next .= $next ;
               
                }
 
         if ($previouspost != null || $nextpost != null ) $previous_next .= '<br style="clear:both;" /></div><br style="clear:both;" />';
 
-        echo $previous_next;
-
+        if ($noecho == true) {
+            return $previous_next;
+            }else{
+            echo $previous_next;
+            }
     }
 
     function ss_get_prenext_image ( $id, $prenext ) {          
@@ -419,6 +443,30 @@ if (!class_exists('ssPnext')) {
        
        return $image;
     }
+            //create substring of the text to the last space and add dots
+    public function ss_Pnext_text($text, $text_length, $short_replace) {
+        // remove all html tags
+        $text = strip_tags($text) . "\n";     
+        // cut down to size
+        if (strlen($text) >= ($text_length+1)){            
+            $short = substr($text,0,$text_length);	
+            if (substr_count($short," ") > 1) {
+                $lastspace = strrpos($short," ");
+                $short = substr($short,0,$lastspace);
+            }
+            $dots = '...';
+        } else { 
+            $short = $text;
+            $dots = '';
+           
+        }
+        // we have to remove any shortcode brackets from the content.
+      $pattern ='/\[.*?\]/';
+      $cuttext = preg_replace($pattern, $short_replace, $short); 
+      $text = $cuttext . $dots;
+      return $text;
+    }
+
             //create substring of the title to the last space and add dots
     public function ss_Pnext_titles($title, $title_length) {
                 
@@ -439,13 +487,18 @@ if (!class_exists('ssPnext')) {
  
     // no image in this post, lets get a default 
     function Pnext_default_image($cat, $prenext){        
-        extract($this->PnextOptions);	
-        
+        extract($this->PnextOpOut);	
+
         if ($css_load == 'default') {
                 $default_image_path = WP_PLUGIN_URL.'/superslider-previousnext-thumbs/plugin-data/superslider/ssPnext/pnext-thumbs/';
             } elseif ($css_load == 'pluginData') {
                 $default_image_path = WP_CONTENT_URL.'/plugin-data/superslider/ssPnext/pnext-thumbs/'; 
+            } elseif ($css_load == 'theme')  {
+                $default_image_path = get_stylesheet_directory_uri().'/plugin-data/superslider/ssPnext/pnext-thumbs/';            
+            } elseif ($css_load == 'off')  {
+                $default_image_path = WP_PLUGIN_URL.'/superslider-previousnext-thumbs/plugin-data/superslider/ssPnext/pnext-thumbs/';            
             }
+
          $default_image = $default_image_path.$cat.'-'.$prenext.'.jpg';
         if (file_exists(ABSPATH."/".substr($default_image,stripos($default_image,"wp-content")))) {            
             $image[0] = $default_image;
@@ -461,7 +514,7 @@ if (!class_exists('ssPnext')) {
     }
 
     function load_Pnext(){        
-       extract($this->PnextOptions);	
+       extract($this->PnextOpOut);	
         
        if (!is_admin() && (is_singular() )){
             if ($css_load != 'off' ) { 
@@ -520,7 +573,7 @@ if (!class_exists('ssPnext')) {
 	}
 
 	function listnewimages() { 		
-	    extract($this->PnextOptions);	
+	    extract($this->PnextOpOut);	
         
         if ($thumb_crop == true) { $crop = 1; }else { $crop = 0;}
 		if( FALSE == get_option('prenext_size_w') ) {	

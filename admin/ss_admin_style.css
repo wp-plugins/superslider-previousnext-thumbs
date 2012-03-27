@@ -1,3 +1,15 @@
+.ss_donate {
+    background: none repeat scroll 0 0 #4C8FC7;
+    border: 1px solid #666666;
+    border-radius: 18px 0 18px 18px;
+    color: #FFFFFF;
+    font-size: 1.2em;
+    position: absolute;
+    right: 18px;
+    top: 15px;
+    width: 330px;
+    text-align: right;
+}
 .ss_label
 {
 	border: 1px solid silver;

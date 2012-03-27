@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright 2008 daiv Mowbray
+Copyright 2012 daiv Mowbray
 
 This file is part of SuperSlider-Pnext
 
@@ -52,26 +52,28 @@ $Pnext_domain = 'superslider-Pnext';
 				"make_thumb"   =>  "on",
 				"auto_insert"   =>  "on",
 				"pnext_location"   =>  "loop_end",
+				"text_length" => "120",
+                "text_type" => "",
+                "short_replace" => "(shortcode)",
 				'delete_options' => ''
 				);
 
 			update_option('ssPnext_options', $Pnext_OldOptions);
 				
-			echo '<div id="message" class="updated fade"><p><strong>' . __( 'Pnext Default Options reloaded.', $Pnext_domain) . '</strong></p></div>';
+			echo '<div id="message" class="updated fade"><p><strong>' . __( 'SuperSlider-PreviousNext default options have been reloaded.', $Pnext_domain) . '</strong></p></div>';
 			
 		}
 		elseif ($_POST['action'] == 'update' ) {
 			
 			check_admin_referer('Pnext_options'); // check the nonce
 					// If we've updated settings, show a message
-			echo '<div id="message" class="updated fade"><p><strong>' . __( 'Pnext Options saved.', $Pnext_domain) . '</strong></p></div>';
+			echo '<div id="message" class="updated fade"><p><strong>' . __( 'SuperSlider-PreviousNext options have been saved.', $Pnext_domain) . '</strong></p></div>';
 			
 			$Pnext_newOptions = array(
 				'load_moo'		=> $_POST['op_load_moo'],
 				'css_load'		=> $_POST['op_css_load'],
 				'css_theme'		=> $_POST["op_css_theme"],
 				'morph_Pnext'	=> $_POST["op_morph_Pnext"],
-				//'opacity'		=> $_POST["op_overlayOpacity"],
 				'resize_dur'	=> $_POST["op_resize_duration"],
 				'trans_type'	=> $_POST["op_trans_type"],
 				'trans_typeout'	=> $_POST["op_trans_typeout"],
@@ -89,6 +91,9 @@ $Pnext_domain = 'superslider-Pnext';
 				'make_thumb'	=> $_POST["op_make_thumb"],
 				'auto_insert'	=> $_POST["op_auto_insert"],
 				'pnext_location'=> $_POST["op_pnext_location"],
+				'text_length'   => $_POST["op_text_length"],
+				'text_type'     => $_POST["op_text_type"],
+				'short_replace' => $_POST["op_short_replace"],
 				'delete_options'	=> $_POST["op_delete_options"]
 			);	
 
@@ -112,12 +117,21 @@ $Pnext_domain = 'superslider-Pnext';
 ?>
 
 <div class="wrap">
+    <div class="ss_donate">       
+       <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+            <input type="hidden" name="cmd" value="_s-xclick">
+            <input type="hidden" name="hosted_button_id" value="N2F3EUVHPYY5G">
+            <div style="float: left; padding:4px 0px 0px 0px; max-width: 70%;">support SuperSlider development with a minor donation</div>
+            <input type="image" style="margin-top:4px;" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+            <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+       </form>
+    </div>
 <form name="Pnext_options" method="post" action="<?php echo $_SERVER['REQUEST_URI'] ?>">
 <?php if ( function_exists('wp_nonce_field') )
 		wp_nonce_field('Pnext_options'); echo "\n"; ?>
 		
 <div style="">
-<a href="http://wp-superslider.com/">
+<a href="http://superslider.daivmowbray.com/">
 <img src="<?php echo $site ?>/wp-content/plugins/superslider-previousnext-thumbs/admin/img/logo_superslider.png" style="margin-bottom: -15px;padding: 20px 20px 0px 20px;" alt="SuperSlider Logo" width="52" height="52" border="0" /></a>
   <h2 style="display:inline; position: relative;">SuperSlider-PreviousNext-Thumbnails Options</h2>
  </div><br style="clear:both;" />
@@ -153,14 +167,15 @@ jQuery(document).ready(function(){
   		} else {
   		echo 'style="display:none;"';
   		}?>	class="ui-state-default" ><a href="#fragment-1"><span>Appearance</span></a></li>
-        <li class="ui-tabs-selected"><a href="#fragment-2"><span>Various options</span></a></li>
-        <li class="ui-state-default"><a href="#fragment-3"><span>Transition Options</span></a></li>
-        <li class="ui-state-default"><a href="#fragment-4"><span>Thumbnail options</span></a></li>
+        <li class="ui-tabs-selected"><a href="#fragment-2"><span>Placement options</span></a></li>
+        <li class="ui-tabs-selected"><a href="#fragment-3"><span>Text options</span></a></li>
+        <li class="ui-state-default"><a href="#fragment-4"><span>Transition Options</span></a></li>
+        <li class="ui-state-default"><a href="#fragment-5"><span>Thumbnail options</span></a></li>
         <li <?php if ($this->base_over_ride != "on") { 
   		 echo '';
   		} else {
   		echo 'style="display:none;"';
-  		}?>	class="ss-state-default" ><a href="#fragment-5"><span>File storage</span></a></li>
+  		}?>	class="ss-state-default" ><a href="#fragment-6"><span>File storage</span></a></li>
     </ul>
     <div id="fragment-1" class="ss-tabs-panel">
  	<div <?php if ($this->base_over_ride != "on") { 
@@ -210,7 +225,7 @@ jQuery(document).ready(function(){
  
 <div id="fragment-2" class="ss-tabs-panel">
 	
-<h3 class="title">Various</h3>
+<h3 class="title">Placement</h3>
 <fieldset style="border:1px solid grey;margin:10px;padding:10px 10px 10px 30px;">
    			<legend><b><?php _e(' Placement options'); ?>:</b></legend>
   	<ul style="list-style-type: none;"> 
@@ -220,6 +235,12 @@ jQuery(document).ready(function(){
 		  <?php if($Pnext_newOptions['post_in_cat'] == "true") echo $checked; ?>  value="true" />
 		  <?php _e('Only show posts from the active category'); ?></label> <br />
 		  <span class="setting-description"><?php _e(' Unselected will display all posts from all categories.',$Pnext_domain); ?></span>		 
+	</li>
+		<li style="border-bottom:1px solid #cdcdcd; padding: 6px 0px 8px 0px;">
+		 <label for="op_excluded_categories"><?php _e('Exclude categories'); ?>:
+		 <input type="text" class="span-text" name="op_excluded_categories" id="op_excluded_categories" size="30" maxlength="300"
+		 value="<?php echo ($Pnext_newOptions['excluded_categories']); ?>" /></label> 
+		  <span class="setting-description"><?php _e(' Exclude as a list of comma seperated category ID numbers.',$Pnext_domain); ?></span>
 	</li>
 	<li style="border-bottom:1px solid #cdcdcd; padding: 6px 0px 8px 0px;">
 		 <label for="op_auto_insert">
@@ -233,13 +254,18 @@ jQuery(document).ready(function(){
 		<select name="op_pnext_location" id="op_pnext_location">
 			  <option <?php if($Pnext_newOptions['pnext_location'] == "content_before") echo $selected; ?> id="content_before" value='content_before'> before content</option>
 			  <option <?php if($Pnext_newOptions['pnext_location'] == "content_after") echo $selected; ?> id="content_after" value='content_after'> after content</option>
+			  <option <?php if($Pnext_newOptions['pnext_location'] == "content_before_after") echo $selected; ?> id="content_before_after" value='content_before_after'> before and after content</option>
 		<!--the_content, the_posts, comment_form, -->
 		</select>
 	</li>
 	
      </ul>
    </fieldset>
-  
+</div><!--  close frag 2-->
+ 
+<div id="fragment-3" class="ss-tabs-panel">
+	
+<h3 class="title">Text</h3>  
 <fieldset style="border:1px solid grey;margin:10px;padding:10px 10px 10px 30px;">
    			<legend><b><?php _e(' Text options'); ?>:</b></legend>
   		 <ul style="list-style-type: none;">  
@@ -263,19 +289,38 @@ jQuery(document).ready(function(){
 		 value="<?php echo ($Pnext_newOptions['title_length']); ?>" /></label> 
 		  <span class="setting-description"><?php _e(' Limit the number of letters in your titles.',$Pnext_domain); ?></span>
 		 
-	</li>
-	<li style="border-bottom:1px solid #cdcdcd; padding: 6px 0px 8px 0px;">
-		 <label for="op_excluded_categories"><?php _e('Exclude categories'); ?>:
-		 <input type="text" class="span-text" name="op_excluded_categories" id="op_excluded_categories" size="30" maxlength="300"
-		 value="<?php echo ($Pnext_newOptions['excluded_categories']); ?>" /></label> 
-		  <span class="setting-description"><?php _e(' Exclude as a list of comma seperated category ID numbers.',$Pnext_domain); ?></span>
-	</li>
+	</li>	
 	
+		<li style="border-bottom:1px solid #cdcdcd; padding: 6px 0px 8px 0px;">	
+	<label for="op_text_type"><?php _e('Which text type to add to the previous / next, if any.',$Pnext_domain); ?></label>
+		<select name="op_text_type" id="op_text_type">
+			  <option <?php if($Pnext_newOptions['text_type'] == "") echo $selected; ?> value=""> None</option>
+			  <option <?php if($Pnext_newOptions['text_type'] == "content") echo $selected; ?> value="content"> content</option>
+			  <option <?php if($Pnext_newOptions['text_type'] == "excerpt") echo $selected; ?> value="excerpt"> excerpt</option>
+		</select>
+	</li>	
+	   
+	   <li style="border-bottom:1px solid #cdcdcd; padding: 6px 0px 8px 0px;">
+		 <label for="op_text_length"><?php _e('Text length'); ?>:
+		 <input type="text" class="span-text" name="op_text_length" id="op_text_length" size="3" maxlength="3"
+		 value="<?php echo ($Pnext_newOptions['text_length']); ?>" /></label> 
+		  <span class="setting-description"><?php _e(' Limit the number of letters in your text.',$Pnext_domain); ?></span>
+		 
+	</li>	
+		
+		<li style="border-bottom:1px solid #cdcdcd; padding: 6px 0px 8px 0px;">
+		 <label for="op_short_replace"><?php _e('shortcode replace'); ?>:
+		 <input type="text" class="span-text" name="op_short_replace" id="op_short_replace" size="30" maxlength="300"
+		 value="<?php echo ($Pnext_newOptions['short_replace']); ?>" /></label> 
+		  <span class="setting-description"><?php _e(' Replace shortcode in text with this.',$Pnext_domain); ?></span>
+		 
+	</li>
+                
      </ul>
    </fieldset>
-</div><!-- close frag2 --> 
+</div><!-- close frag3 --> 
 
-	<div id="fragment-3" class="ss-tabs-panel">
+	<div id="fragment-4" class="ss-tabs-panel">
 	<h3 class="title">Pnext Transition Options</h3>
 	
 		<fieldset style="border:1px solid grey;margin:10px;padding:10px 10px 10px 30px;"><!-- options start -->
@@ -335,9 +380,9 @@ jQuery(document).ready(function(){
 
      </ul>
   </fieldset>
-  </div><!--  close frag 3-->
+  </div><!--  close frag 4-->
 		
-	<div id="fragment-4" class="ss-tabs-panel">
+	<div id="fragment-5" class="ss-tabs-panel">
 	<h3 class="title">Thumbnail</h3>
 		  
 		  <fieldset style="border:1px solid grey;margin:10px;padding:10px 10px 10px 30px;"><!-- options start -->
@@ -411,9 +456,9 @@ jQuery(document).ready(function(){
          </li>
      </ul>
    </fieldset>
-</div><!-- close frag4 -->
+</div><!-- close frag5 -->
 
-<div id="fragment-5" class="ss-tabs-panel">
+<div id="fragment-6" class="ss-tabs-panel">
 	
 	<div
 <?php if ($this->base_over_ride != "on") { 
@@ -430,7 +475,7 @@ jQuery(document).ready(function(){
     	<label for="op_load_moo">
     	<input type="checkbox" 
     	<?php if($Pnext_newOptions['load_moo'] == "on") echo $checked; ?> name="op_load_moo" id="op_load_moo" />
-    	<?php _e(' Load Mootools 1.2 into your theme header.',$Pnext_domain); ?></label>
+    	<?php _e(' Load Mootools 1.4.1 into your theme header.',$Pnext_domain); ?></label>
     	
 	</li>
 	
@@ -446,16 +491,20 @@ jQuery(document).ready(function(){
 			<?php _e(' Load css from plugin-data folder, see side note. (Recommended)',$Pnext_domain); ?></label><br />
     	<label for="op_css_load3">
 			<input type="radio" name="op_css_load"  id="op_css_load3"
+			<?php if($Pnext_newOptions['css_load'] == "theme") echo $checked; ?> value="theme" />
+			<?php _e(' Load css, from your theme folder.',$Pnext_domain); ?></label><br />
+		<label for="op_css_load4">
+			<input type="radio" name="op_css_load"  id="op_css_load4"
 			<?php if($Pnext_newOptions['css_load'] == "off") echo $checked; ?> value="off" />
-			<?php _e(' Don\'t load css, manually add to your theme css file.',$Pnext_domain); ?></label>
+			<?php _e(' Don\'t load css. You will need to manually add css info to your theme css file. Also, the default images (for posts with no image.) will now need to be placed in wp-content/plugin-data/superslider/ssPnext/pnext-thumbs/',$Pnext_domain); ?></label>
 
     </li>
     </ul>
      </fieldset>
     
 		<p>
-		<?php _e(' If your theme or any other plugin loads the mootools 1.2 javascript framework into your file header, you can de-activate it here.',$Pnext_domain); ?></p><p><?php _e(' Via ftp, move the folder named plugin-data from this plugin folder into your wp-content folder. This is recomended to avoid over writing any changes you make to the css files when you update this plugin.',$Pnext_domain); ?></p></td>
-	</div><!-- close frag 8 -->
+		<?php _e(' If your theme or any other plugin loads the mootools 1.4.1 javascript framework into your file header, you can de-activate it here.',$Pnext_domain); ?></p><p><?php _e(' Via ftp, move the folder named plugin-data from this plugin folder into your wp-content folder. This is recomended to avoid over writing any changes you make to the css files when you update this plugin.',$Pnext_domain); ?></p></td>
+	</div><!-- close frag 6 -->
 </div><!--  close tabs -->
 <p>
 <label for="op_delete_options">
