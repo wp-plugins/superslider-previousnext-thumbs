@@ -2,10 +2,10 @@
 /**
 Plugin Name: SuperSlider-PreviousNext-Thumbs
 Plugin URI: http://superslider.daivmowbray.com/superslider/superslider-previousNext-thumbs
-Description: A previous-next post, thumbnail navigation creator. Works specifically on the single post pages. Uses Mootools 1.4 javascript. 
+Description: A previous-next post, thumbnail navigation creator. Works specifically on the single post pages. Uses Mootools 1.4.5 javascript. 
 Author URI: http://www.daivmowbray.com
 Author: Daiv Mowbray
-Version: 2.0
+Version: 2.1
 
 
 */
@@ -35,7 +35,7 @@ if (!class_exists('ssPnext')) {
 		var $js_path;
 		var $PnextOpOut;
 		var $optionsName = "ssPnext_options";
-		var $Pnext_domain = 'superslider-Pnext';
+		var $plugin_domain = 'superslider-Pnext';
 		var $base_over_ride;
 		var $show_over_ride;
 		var $ssBaseOpOut;
@@ -74,12 +74,32 @@ if (!class_exists('ssPnext')) {
 		}
 		
 		function language_switcher() {
+		  global $plugin_domain;
 
-			$superslider_Pnext_locale = get_locale();
-			$superslider_Pnext_mofile = dirname(__FILE__) . "/languages/superslider-pnext-".$superslider_Pnext_locale.".mo";
-			$plugin_dir = basename(dirname(__FILE__));
+			$superslider_login_locale = get_locale();
+			$superslider_login_mofile = dirname(__FILE__) . "/languages/superslider-login-".$superslider_login_locale.".mo";
+			$plugin_dir = dirname(plugin_basename(__FILE__));
+			load_plugin_textdomain($plugin_domain, false, $plugin_dir.'/languages/' );		
+		}
+		
+		function Pnext() {        
 
-			load_plugin_textdomain($Pnext_domain, 'wp-content/plugins/languages/' . $plugin_dir );		
+        $this->PnextOpOut = get_option($this->optionsName);
+         
+        register_activation_hook(__FILE__, array(&$this,'Pnext_init') ); //http://codex.wordpress.org/Function_Reference/register_activation_hook
+        register_deactivation_hook( __FILE__, array(&$this,'Pnext_ops_deactivation') ); //http://codex.wordpress.org/Function_Reference/register_deactivation_hook
+        
+        add_action ( 'init', array(&$this,'Pnext_init' ) );			
+        add_action ( 'admin_menu', array(&$this, 'plugin_setup_optionspage'));        
+        add_action ( 'admin_init', array(&$this, 'Pnext_create_thumbs' ) );        
+		add_action ( 'admin_init', array(&$this, 'Pnext_create_media_page') );
+    	}
+    	
+    	/**
+		* Saves the admin options to the database.
+		*/
+		function savePnextOptions(){
+			update_option($this->optionsName, $this->PnextOptions);
 		}
 		
 		/**
@@ -92,7 +112,7 @@ if (!class_exists('ssPnext')) {
 				"css_load"    => "default",
 				"css_theme"   => "default", 
 				"morph_Pnext" => "on",
-				//"opacity"     => "0.7",
+				"text_over"     => "off",
 				"resize_dur"  => "800",
 				"Pnext_class" => "",
 				"trans_type"	=> "Sine",
@@ -109,10 +129,10 @@ if (!class_exists('ssPnext')) {
 				"num_ran"     => "2",
 				"make_thumb"   =>  "on",
 				"auto_insert"   =>  "on",
-				"pnext_location"   =>  "content_end",
+				"pnext_location"   =>  "content_after",
 				"text_length" => "120",
-                "text_type" => "",
-                "short_replace" => "(shortcode)",
+                "text_type" => "content",
+                "short_replace" => " ",
 				'delete_options' => ""
 				);
 
@@ -126,13 +146,7 @@ if (!class_exists('ssPnext')) {
 			update_option($this->optionsName, $PnextOptions);
 				return $PnextOptions;
 		}
-		
-		/**
-		* Saves the admin options to the database.
-		*/
-		function savePnextOptions(){
-			update_option($this->optionsName, $this->PnextOptions);
-		}
+
 		
 		/**
 		* Loads functions into WP API
@@ -142,11 +156,14 @@ if (!class_exists('ssPnext')) {
 
 			$this->PnextOptions = $this->set_Pnext_options();
 			$this->set_Pnext_paths();
+			$admin_js_path = WP_CONTENT_URL . '/plugins/'. plugin_basename(dirname(__FILE__)) . '/admin/js/';
 			
+			 $this->language_switcher();
+			 
 			// lets see if the base plugin is here and get its options
 			if (class_exists('ssBase')) {
 					$this->ssBaseOpOut = get_option('ssBase_options');
-					$this->base_over_ride = $this->ssBaseOpOut[ss_global_over_ride];
+					$this->base_over_ride = $this->ssBaseOpOut['ss_global_over_ride'];
 				}else{
 				$this->base_over_ride = 'false';
 			}			
@@ -159,16 +176,25 @@ if (!class_exists('ssPnext')) {
 			
 			extract($this->PnextOptions);
 			    	               
-            // remove_action( 'template', 'previous_post_link', 1 );
-    	   // remove_action( 'template',  'next_post_link', 1 );
+            remove_action( 'template', 'previous_post_link', 1 );
+    	    remove_action( 'template',  'next_post_link', 1 );
     	   
             $this->js_path = WP_CONTENT_URL . '/plugins/'. plugin_basename(dirname(__FILE__) ) . '/js/';
 			
-  			wp_register_script('moocore', $this->js_path.'mootools-core-1.4.1-full-compat-yc.js', NULL, '1.4.1');
-			
+  			wp_register_script('moocore', $this->js_path.'mootools-core-1.4.5-full-compat-yc.js', NULL, '1.4.5');			
 			wp_register_script( 'moomore', $this->js_path. 'mootools-more-1.4.0.1.js', array( 'moocore' ), '1.4.0.1');
 			
 			if ( (class_exists('ssBase')) && ($this->ssBaseOpOut['ss_global_over_ride']) ) { extract($this->ssBaseOpOut); }
+			
+			$cssAdminPath = WP_PLUGIN_URL.'/superslider-previousnext-thumbs/admin/';    			
+    		
+    		wp_register_style('superslider_admin', $cssAdminPath.'ss_admin_style.css');
+    		wp_register_style('superslider_admin_tool', $cssAdminPath.'ss_admin_tool.css');
+  			
+  			wp_register_script( 'jquery-dimensions', $admin_js_path.'jquery.dimensions.min.js', array( 'jquery-ui-core' ), '2', false);
+  			wp_register_script( 'jquery-tooltip', $admin_js_path.'jquery.tooltip.min.js', array( 'jquery-dimensions' ), '2', false);
+  			wp_register_script( 'superslider-admin-tool', $admin_js_path.'superslider-admin-tool.js', array( 'jquery', 'jquery-tooltip' ), '2', false);
+
 
             switch ($css_load) {
             case 'default':
@@ -187,63 +213,70 @@ if (!class_exists('ssPnext')) {
         
             wp_register_style('superslider_Pnext', $cssFile);
             
-
             if ( $morph_Pnext == 'on' ) {  			
                add_action ( 'wp_enqueue_scripts', array(&$this,'Pnext_add_javascript') );
                add_action ( 'wp_footer', array(&$this,'Pnext_starter') );			   
              }
              if ($css_load != 'off' ) {
                  add_action ( 'wp_print_styles', array(&$this,'Pnext_add_css') );
-               }
-             
-             if ($auto_insert == 'on') {  
+             }
+ 
+             if ($auto_insert == 'on' && !is_page()) {  // && is_singular()        
                  add_action ( 'template_redirect', array(&$this,'Pnext_add_thumb_nav' ) );
              }
 
-
 		}
 		
-    /**
-    * Outputs the HTML for the admin sub page.
-    */
-    function Pnext_ui(){
-        global $base_over_ride;
-        global $Pnext_domain;
-        include_once 'admin/superslider-pnext-ui.php';
-    } 
-    
-    function Pnext_admin_pages(){    
-        if (  function_exists('add_options_page') ) {
-            if (  current_user_can('manage_options') ) {
-                if (!class_exists('ssBase')) $plugin_page = add_options_page(__('Superslider Pnext', 'superslider-Pnext'),__('SuperSlider-Pnext', 'superslider-Pnext'), 8, 'superslider-pnext', array(&$this, 'Pnext_ui'));
-                add_filter('plugin_action_links_' . plugin_basename(__FILE__), array(&$this, 'filter_plugin_Pnext'), 10, 2 );	
-                
-                add_action ( 'admin_print_styles', array(&$this,'ssbox_admin_style'));
-                if (!class_exists('ssBase')) add_action('admin_print_scripts-'.$plugin_page, array(&$this,'Pnext_admin_script'));
-            }					
-        }
+		/**
+		* Outputs the HTML for the admin sub page.
+		*/
+	function Pnext_ui(){
+		global $base_over_ride;
+		global $plugin_domain;
+		include_once 'admin/superslider-pnext-ui.php';
+	} 
+	
+	function plugin_setup_optionspage(){    
+		if (  function_exists('add_options_page') && current_user_can('manage_options')) {
+				$plugin_page = add_options_page(__('Superslider Pnext', 'superslider-Pnext'),__('SuperSlider-Pnext', 'superslider-Pnext'), 'manage_options', 'superslider-pnext', array(&$this, 'Pnext_ui'));
+				add_filter('plugin_action_links_' . plugin_basename(__FILE__), array(&$this, 'filter_plugin_Pnext'), 10, 2 );	
+				
+				add_action ( 'admin_print_scripts-'.$plugin_page, array(&$this,'ss_admin_style'));
+				add_action ( 'admin_print_scripts-'.$plugin_page, array(&$this,'ss_admin_script'));				
+		}
+	}
+	function ss_admin_script(){
+		wp_enqueue_script( 'jquery' );
+		wp_enqueue_script( 'jquery-ui-core');
+		wp_enqueue_script( 'jquery-ui-tabs');  
+	    wp_enqueue_script( 'jquery-tooltip' );
+		wp_enqueue_script( 'superslider-admin-tool' );
+	
+	}
+		            
+    function ss_admin_style(){
+        wp_enqueue_style( 'superslider_admin');
+    	wp_enqueue_style( 'superslider_admin_tool');
+        
     }
-    function Pnext_admin_script(){
-          wp_enqueue_script('jquery-ui-tabs');	// this will load the jquery tabs script into head
-    
-    }
-    /**
-    * Add link to options page from plugin list.
-    */
-    function filter_plugin_Pnext($links, $file) {
-        static $this_plugin;
-            if (  ! $this_plugin ) $this_plugin = plugin_basename(__FILE__);
-
-        if (  $file == $this_plugin )
-            $settings_link = '<a href="admin.php?page=superslider-pnext">'.__('Settings', $Pnext_domain).'</a>';
-            array_unshift( $links, $settings_link ); //  before other links
-            return $links;
-    }		
+		/**
+		* Add link to options page from plugin list.
+		*/
+		function filter_plugin_Pnext($links, $file) {
+			global $plugin_domain;
+			static $this_plugin;
+				if (  ! $this_plugin ) $this_plugin = plugin_basename(__FILE__);
+	
+			if (  $file == $this_plugin )
+				$settings_link = '<a href="admin.php?page=superslider-pnext">'.__('Settings', $plugin_domain).'</a>';
+				array_unshift( $links, $settings_link ); //  before other links
+				return $links;
+		}		
     /**
     *	remove options from DB upon deactivation
     */
     function Pnext_ops_deactivation(){		
-        if($this->PnextOpOut[delete_options] == true){
+        if($this->PnextOpOut['delete_options'] == true){
             delete_option($this->optionsName);
             delete_option('prenext_size_w');
             delete_option('prenext_size_h');
@@ -252,10 +285,10 @@ if (!class_exists('ssPnext')) {
     }
 
     function Pnext_add_javascript(){
-        $morph_Pnext = $this->PnextOpOut[morph_Pnext];
-        $load_moo = $this->PnextOpOut[load_moo];
-       if ( (!is_admin()) && (function_exists('wp_enqueue_script')) && ( $morph_Pnext == 'on') && ( is_singular() )) {
-            if ( ($this->base_over_ride != "on") && ($load_moo == 'on') ) {
+       // $morph_Pnext = $this->PnextOpOut['morph_Pnext'];
+      //  $load_moo = $this->PnextOpOut['load_moo'];
+       if ( (!is_admin()) && (function_exists('wp_enqueue_script')) && ( $this->PnextOpOut['morph_Pnext'] == 'on') && ( is_singular() )) {
+            if ( ($this->base_over_ride != "on") && ($this->PnextOpOut['load_moo'] == 'on') ) {
                wp_enqueue_script('moocore');		
                wp_enqueue_script('moomore');
             }
@@ -266,18 +299,17 @@ if (!class_exists('ssPnext')) {
     * Adds a link to the stylesheet in the header
     */
     function Pnext_add_css() {
-        $css_load = $this->PnextOpOut[css_load];         
-         if ( ($css_load !== 'off') && (is_singular() ) ){
-           
+        //$css_load = $this->PnextOpOut['css_load'];         
+         if ( ($this->PnextOpOut['css_load'] !== 'off') && (is_singular() ) ){           
             wp_enqueue_style( 'superslider_Pnext');          
           }
     }
     
     function Pnext_starter(){
-       $mytrans = "Fx.Transitions.".$this->PnextOpOut[trans_type].".".$this->PnextOpOut[trans_typeout];
+       $mytrans = "Fx.Transitions.".$this->PnextOpOut['trans_type'].".".$this->PnextOpOut['trans_typeout'];
                        
-            $mystarter = "
-            var pnext = $$('div.button_wrap'); pnext.each(function(movePnext, i) { var pnextHit = movePnext.getElements('.slidebttn'); var pnextMove = movePnext.getElement('.pnext_tag'); var span = pnextMove.getElement('span'); var PnextMorph = new Fx.Morph(pnextMove, { unit: 'px', link: 'cancel', duration: ".$this->PnextOpOut[resize_dur].", transition: ".$mytrans.", fps: 30
+        $mystarter = "
+            var pnext = $$('div.button_wrap'); pnext.each(function(movePnext, i) { var pnextHit = movePnext.getElements('.slidebttn'); var pnextMove = movePnext.getElement('.pnext_tag'); var span = pnextMove.getElement('span'); var PnextMorph = new Fx.Morph(pnextMove, { unit: 'px', link: 'cancel', duration: ".$this->PnextOpOut['resize_dur'].", transition: ".$mytrans.", fps: 30
             });
             pnextHit.addEvents({
                 mouseenter: function(e) { PnextMorph.start('.pnext_tag_active'); span.fade('in'); pnextHit.addClass('button_c'); },
@@ -285,7 +317,7 @@ if (!class_exists('ssPnext')) {
                });       
             });";
               
-        $starter .= "\n"."<script type=\"text/javascript\">\n";
+        $starter = "\n"."<script type=\"text/javascript\">\n";
         $starter .= "\t"."// <![CDATA[\n";		
         $starter .= "window.addEvent('domready', function() {
                     ".$mystarter."					
@@ -296,32 +328,21 @@ if (!class_exists('ssPnext')) {
         echo $starter;
     
     }
-		
-    function Pnext() {        
-        $this->PnextOpOut = get_option($this->optionsName);
-         
-        register_activation_hook(__FILE__, array(&$this,'Pnext_init') ); //http://codex.wordpress.org/Function_Reference/register_activation_hook
-        register_deactivation_hook( __FILE__, array(&$this,'Pnext_ops_deactivation') ); //http://codex.wordpress.org/Function_Reference/register_deactivation_hook
-        
-        add_action ( 'init', array(&$this,'Pnext_init' ) );			
-        add_action ( 'admin_menu', array(&$this,'Pnext_admin_pages'));        
-        add_action ( 'admin_init', array(&$this,'Pnext_create_thumbs' ) );        
-		add_action( 'admin_init', array(&$this, 'Pnext_create_media_page') );
-    }
+    
     
     function Pnext_add_thumb_nav() {
-    	   $auto_insert = $this->PnextOpOut[auto_insert];
- 
-    	   if ( ( is_singular()) && ($auto_insert == 'on') ) {    	       
-    	       add_filter ( 'the_content', array(&$this,"ss_previous_next_content"));
-    	   } elseif ( is_singular()) { 
+    	  // $auto_insert = $this->PnextOpOut['auto_insert'];
+
+		if ( is_single() && $this->PnextOpOut['auto_insert'] == 'on' ) { 
+    	       add_filter ( 'the_content', array(&$this,"ss_pnext_content"));
+    	   } elseif ( is_single() ) { 
     	       add_filter ( $pnext_location, array(&$this,"ss_previous_next_nav"));  
     	   }
-    	   
     	}
         // if location is above or below content
-    function ss_previous_next_content($content = '') {
-        $pnext_location = $this->PnextOpOut[pnext_location];	
+    function ss_pnext_content($content = '') {
+
+        $pnext_location = $this->PnextOpOut['pnext_location'];	
         $noecho = true;
 
         switch($pnext_location) {
@@ -348,64 +369,76 @@ if (!class_exists('ssPnext')) {
         $thumb_w = get_option($thumbsize.'_size_w');
         $thumb_h = get_option($thumbsize.'_size_h');
         
-        $previouspost = get_previous_post($post_in_cat, $excluded_categories);
-        $nextpost = get_next_post($post_in_cat, $excluded_categories);
+        if(is_singular()) {
+        	$previouspost = get_previous_post($post_in_cat, $excluded_categories);
+        	$nextpost = get_next_post($post_in_cat, $excluded_categories);
+        }
 
-        if ($previouspost != null || $nextpost != null ) $previous_next = '<div id="pnext-nav" class="navigation"><br style="clear:both;" />';
+        if ($previouspost != null || $nextpost != null ) $previous_next = '<br style="clear:both;height:0px;" /><div id="pnext-nav" class="pnext-navigation">';
                   
-             if ($previouspost != null) {
-          
+             if ($previouspost != null || $previouspost != '') {
+         		
                $preid = $previouspost->ID;
+               $ptext ='';
                if ($text_type == 'content') { $ptext = $previouspost->post_content; }
-                elseif ($text_type == 'excerpt') {$ptext = $previouspost->post_excerpt; }             
-               
-               $image = ssPnext::ss_get_prenext_image($preid, 'previous');
+                elseif ($text_type == 'excerpt') {$ptext = $previouspost->post_excerpt; }
+                elseif ($text_type == 'href') {$ptext = $previouspost->guid; }
+                elseif ($text_type == 'post_date') {$ptext = $previouspost->post_date; }
+
+               $image = ssPnext::ss_get_pnext_image($preid, 'previous');
                $title = ssPnext::ss_Pnext_titles($previouspost->post_title, $title_length);
-               if($text_type != '')$ptext = ssPnext::ss_Pnext_text($ptext, $text_length, $short_replace);
                
+               if($text_type !== '' )$ptext = ssPnext::ss_Pnext_text($ptext, $text_length, $short_replace);
+
                $link = get_permalink($preid);
 
-               $previous  = '<div class="button_wrap nav_previous alignleft"><a href="'.$link.'" class="slidebttn">';
+               $previous  = '<div class="button_wrap nav_previous alignleft"><a href="'.$link.'" class="slidebttn" title="'.$ptext.'">';
                $previous .= '<img class=" nextpost_thumb '.$image[3].'" src="' . $image[0] . '" alt="' . $title . '" width="' . $thumb_w . '" height="' . $thumb_h . '" /></a><br />';
-               if(($text_type != '') && ($ptext !=''))$previous .= '<p>'.$ptext.'</p>';
+               if(($text_type != '') && ($ptext !='') && ($text_over =='on'))$previous .= '<p>'.$ptext.'</p>';
                $previous .= '
                     <div class="pnext_tag" id="pnext_tag1"><span>'.$previous_text.'</span></div>
                     <a class="button_bLeft slidebttn" title="'.$previouspost->post_title.'" id="button_bLeft" href="'.$link.'">'.$title.'</a>
-                    </div>';
+                    </div><!-- close ss-previous -->';
                $previous_next .=  $previous;
                }
 
-            if ($nextpost != null) {  
+            if ($nextpost != null || $nextpost != '') {  
                 
                 $nextid = $nextpost->ID;   
+                $ntext = '';
                 if ($text_type == 'content') { $ntext = $nextpost->post_content; }
                 elseif ($text_type == 'excerpt') {$ntext = $nextpost->post_excerpt; }
-                $image = ssPnext::ss_get_prenext_image($nextid, 'next');
+                elseif ($text_type == 'href') {$ntext = $nextpost->guid; }
+                elseif ($text_type == 'post_date') {$ntext = $nextpost->post_date; }
+ 
+                $image = ssPnext::ss_get_pnext_image($nextid, 'next');
                 $title = ssPnext::ss_Pnext_titles($nextpost->post_title, $title_length);
-                if($text_type != '')$ntext = ssPnext::ss_Pnext_text($ntext, $text_length, $short_replace);
+               
+                if($text_type !== '')$ntext = ssPnext::ss_Pnext_text($ntext, $text_length, $short_replace);
+
                 $link = get_permalink($nextid);
 
-                $next = '<div class="button_wrap nav_next alignright"><a href="'.$link.'" class="slidebttn">';
+                $next = '<div class="button_wrap nav_next alignright"><a href="'.$link.'" class="slidebttn" title="'.$ntext.'">';
                 $next .= '<img class=" nextpost_thumb '.$image[3].'" src="' . $image[0] . '" alt="' . $title . '" width="'.$thumb_w.'" height="'.$thumb_h.'" /></a><br />';
-                if(($text_type != '') && ($ntext !=''))$next .= '<p>'.$ntext.'</p>';
+                if(($text_type !== '') && ($ntext !='')  && ($text_over =='on'))$next .= '<p>'.$ntext.'</p>';
                 $next .= '
                     <div class="pnext_tag" id="pnext_tag2"><span>'.$next_text.'</span></div>
                     <a class="button_bRight slidebttn" title="'.$nextpost->post_title.'" id="button_bRight" href="'.$link.'">'.$title.'</a>
-                    </div><!-- close pnext-nav -->';
+                    </div><!-- close ss-next -->';
                $previous_next .= $next ;
               
                }
 
-        if ($previouspost != null || $nextpost != null ) $previous_next .= '<br style="clear:both;" /></div><br style="clear:both;" />';
+        if ($previouspost != null || $nextpost != null ) $previous_next .= '<br style="clear:both;height:0px;" /></div><!-- close ss-Pnext -->';
 
-        if ($noecho == true) {
+        if ($noecho == true && isset($previous_next)) {
             return $previous_next;
-            }else{
+            }elseif (isset($previous_next)){
             echo $previous_next;
             }
     }
 
-    function ss_get_prenext_image ( $id, $prenext ) {          
+    function ss_get_pnext_image ( $id, $prenext ) {          
        extract($this->PnextOpOut);
             
             // check first for a post 2.9 post thumb setting
@@ -486,18 +519,22 @@ if (!class_exists('ssPnext')) {
     }
  
     // no image in this post, lets get a default 
-    function Pnext_default_image($cat, $prenext){        
-        extract($this->PnextOpOut);	
+    function Pnext_default_image($cat, $prenext){	
 
-        if ($css_load == 'default') {
-                $default_image_path = WP_PLUGIN_URL.'/superslider-previousnext-thumbs/plugin-data/superslider/ssPnext/pnext-thumbs/';
-            } elseif ($css_load == 'pluginData') {
-                $default_image_path = WP_CONTENT_URL.'/plugin-data/superslider/ssPnext/pnext-thumbs/'; 
-            } elseif ($css_load == 'theme')  {
-                $default_image_path = get_stylesheet_directory_uri().'/plugin-data/superslider/ssPnext/pnext-thumbs/';            
-            } elseif ($css_load == 'off')  {
-                $default_image_path = WP_PLUGIN_URL.'/superslider-previousnext-thumbs/plugin-data/superslider/ssPnext/pnext-thumbs/';            
-            }
+		switch($this->PnextOpOut['css_load']){
+		  case'default' :
+			$default_image_path = WP_PLUGIN_URL.'/superslider-previousnext-thumbs/plugin-data/superslider/ssPnext/pnext-thumbs/';
+		    break;
+		  case'pluginData' :
+		  	$default_image_path = WP_CONTENT_URL.'/plugin-data/superslider/ssPnext/pnext-thumbs/';
+		  	break;
+		  case'theme' :
+		  	$default_image_path = get_stylesheet_directory_uri().'/plugin-data/superslider/ssPnext/pnext-thumbs/'; 
+		  	break;
+		  case'off' :
+			$default_image_path = WP_PLUGIN_URL.'/superslider-previousnext-thumbs/plugin-data/superslider/ssPnext/pnext-thumbs/'; 
+		  	break;
+		  }
 
          $default_image = $default_image_path.$cat.'-'.$prenext.'.jpg';
         if (file_exists(ABSPATH."/".substr($default_image,stripos($default_image,"wp-content")))) {            
@@ -505,7 +542,7 @@ if (!class_exists('ssPnext')) {
             $image[3] = 'category_'.$prenext;
             
         } else {
-            $n = mt_rand(1, $num_ran);          
+            $n = mt_rand(1, $this->PnextOpOut['num_ran']);          
             $image[0] = $default_image_path.'random-image-'.$n.'-'.$prenext.'.jpg';         
             $image[3] = 'random_'.$prenext;
         }
@@ -513,29 +550,18 @@ if (!class_exists('ssPnext')) {
         return $image;
     }
 
-    function load_Pnext(){        
-       extract($this->PnextOpOut);	
-        
+    function load_Pnext(){
        if (!is_admin() && (is_singular() )){
-            if ($css_load != 'off' ) { 
+            if ($this->PnextOpOut['css_load'] != 'off' ) { 
                 add_action ( 'wp_print_styles', array(&$this,'Pnext_add_css' ));
                
              }
-            if ( $morph_Pnext == 'on'){  
+            if ( $this->PnextOpOut['morph_Pnext'] == 'on'){  
              
              add_action ( 'wp_print_scripts', array(&$this,'Pnext_add_javascript' ));
              add_action ( "wp_footer", array(&$this,"Pnext_starter"));
             }
        }
-    }
-            
-    function ssbox_admin_style(){
-        if ($this->base_over_ride != "on") {
-            $cssAdminFile = WP_PLUGIN_URL.'/superslider-previousnext-thumbs/admin/ss_admin_style.css';
-            wp_register_style('superslider_admin', $cssAdminFile);
-            wp_enqueue_style( 'superslider_admin');
-        }	
-        
     }
     
     function Pnext_create_media_page() {    			
@@ -572,10 +598,8 @@ if (!class_exists('ssPnext')) {
         return $sizes;
 	}
 
-	function listnewimages() { 		
-	    extract($this->PnextOpOut);	
-        
-        if ($thumb_crop == true) { $crop = 1; }else { $crop = 0;}
+	function listnewimages() {
+        if ($this->PnextOpOut['thumb_crop'] == true) { $crop = 1; }else { $crop = 0;}
 		if( FALSE == get_option('prenext_size_w') ) {	
 				add_option('prenext_size_w', $thumb_w );
 				add_option('prenext_size_h', $thumb_h);

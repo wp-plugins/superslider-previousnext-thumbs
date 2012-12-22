@@ -1,0 +1,347 @@
+# Copyright (C) 2012 SuperSlider-PreviousNext-Thumbs
+# This file is distributed under the same license as the SuperSlider-PreviousNext-Thumbs package.
+msgid ""
+msgstr ""
+"Project-Id-Version: SuperSlider-PreviousNext-Thumbs 2.0\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/superslider-previousnext-"
+"thumbs\n"
+"POT-Creation-Date: 2012-11-24 04:06:17+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2012-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: admin/superslider-pnext-ui.php:28
+msgid "ACCESS DENIED: Your don't have permission to do this."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:63
+msgid "SuperSlider-PreviousNext default options have been reloaded."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:70
+msgid "SuperSlider-PreviousNext options have been saved."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:190
+msgid " Themes"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:202
+msgid " For thumbnails of 150 x 150 px."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:207
+msgid " For thumbnails of 80 x 80 px."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:212 admin/superslider-pnext-ui.php:217
+msgid " For thumbnails of 180 x 30 px."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:230
+msgid " Placement options"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:236
+msgid "Only show posts from the active category"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:237
+msgid " Unselected will display all posts from all categories."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:240
+msgid "Exclude categories"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:243
+msgid " Exclude as a list of comma seperated category ID numbers."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:249
+msgid "Automatically insert Pnext navigation into your single posts page"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:250
+msgid ""
+" Unselected will require manual insertion of the required function into your "
+"single.php theme file."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:253
+msgid " Pnext placement on your page."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:270
+msgid " Text options"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:273
+msgid "next text"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:276
+msgid " Text to display upon roll over next title."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:280
+msgid "previous text"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:283
+msgid " Text to display upon roll over previous title."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:287
+msgid "Title length"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:290
+msgid " Limit the number of letters in your titles."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:295
+msgid "Which text type to add to the previous / next, if any."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:304
+msgid "Text length"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:307
+msgid " Limit the number of letters in your text."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:312
+msgid "shortcode replace"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:315
+msgid " Replace shortcode in text with this."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:327
+msgid " Personalize Transitions"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:334
+msgid "Turn Morph Pnext image on"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:338
+msgid " Transition type"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:352
+msgid " Transition action."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:358
+msgid " IN is the begginning of transition. OUT is the end of transition."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:361
+msgid " Overlay opacity "
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:364
+msgid "   (default 0.7)"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:367
+msgid " Transition time "
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:370
+msgid "  In milliseconds, ie: 1000 = 1 second, (default 500)"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:373
+msgid "Pnext thumbnail class"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:376
+msgid " Add a class for the thumbnail."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:389
+msgid " Personalize thumbnails"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:393
+msgid " Thumbnail Size"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:422
+msgid " Which image size to use in your Previous next navigation. "
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:426
+msgid ""
+" Different thumbnail sizes effect the plugin themes. Each theme is set for a "
+"different Image size. You may have to edit the theme css file to suit your "
+"image size. "
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:432
+msgid "Make thumbnail. "
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:433
+msgid ""
+"If you want to have custom sized Prenext thumbnails, turn the Make thumbnail "
+"on, save your options, then select the prenext option from the Thumbnail "
+"Size options list above.<br /> The SuperSlider-Pnext plugin can create "
+"additional Prenext thumbnails. This happens upon image upload. So to create "
+"Prenext thumbs for previously uploaded images you would need to install the "
+"<a href=\"http://wordpress.org/extend/plugins/regenerate-thumbnails/\" "
+">Regenerate thumnails plugin</a>."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:435
+msgid " Width "
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:438 admin/superslider-pnext-ui.php:442
+msgid "  "
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:439
+msgid " Height "
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:446
+msgid " Create cropped, unsellected leaves the image proportional. "
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:447
+msgid ""
+"(These image settings are also available on the <a href=\"options-media.php"
+"\">Media Settings page</a>)."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:450
+msgid " Number of Random "
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:453
+msgid ""
+" How many random images to pick from, if there are no images attached or "
+"imbeded in the post. And you don't have default category thumbnail images "
+"created. \n"
+"             To create default category thumbnails: for each category add an "
+"image with the name <b>cat-yourCatSlugName-previous.jpg</b> and <b>cat-"
+"yourCatSlugName-next.jpg</b> to the folder <b>plugin-data/superslider/"
+"ssPnext/Pnext-thumbs/</b>. \n"
+"             Categories with no Pnext image will display one of the random "
+"thumbnails."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:472
+msgid " Loading Options"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:478
+msgid " Load Mootools 1.4.1 into your theme header."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:487
+msgid " Load css from default location. Pnext plugin folder."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:491
+msgid " Load css from plugin-data folder, see side note. (Recommended)"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:495
+msgid " Load css, from your theme folder."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:499
+msgid ""
+" Don't load css. You will need to manually add css info to your theme css "
+"file. Also, the default images (for posts with no image.) will now need to "
+"be placed in wp-content/plugin-data/superslider/ssPnext/pnext-thumbs/"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:506
+msgid ""
+" If your theme or any other plugin loads the mootools 1.4.1 javascript "
+"framework into your file header, you can de-activate it here."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:506
+msgid ""
+" Via ftp, move the folder named plugin-data from this plugin folder into "
+"your wp-content folder. This is recomended to avoid over writing any changes "
+"you make to the css files when you update this plugin."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:512
+msgid "Remove options. "
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:513
+msgid ""
+"Select to have the plugin options removed from the data base upon "
+"deactivation."
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:517
+msgid " Reload Default Options"
+msgstr ""
+
+#: admin/superslider-pnext-ui.php:518
+msgid " Update options"
+msgstr ""
+
+#: superslider-previousnext-thumbs.php:218
+msgid "Superslider Pnext"
+msgstr ""
+
+#: superslider-previousnext-thumbs.php:218
+msgid "SuperSlider-Pnext"
+msgstr ""
+
+#: superslider-previousnext-thumbs.php:238
+msgid "Settings"
+msgstr ""
+
+#: superslider-previousnext-thumbs.php:554
+msgid " Max Width "
+msgstr ""
+
+#: superslider-previousnext-thumbs.php:555
+msgid " Max Height "
+msgstr ""
+
+#: superslider-previousnext-thumbs.php:558
+msgid " Crop PreNext image to exact dimensions"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "SuperSlider-PreviousNext-Thumbs"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid ""
+"http://superslider.daivmowbray.com/superslider/superslider-previousNext-"
+"thumbs"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"A previous-next post, thumbnail navigation creator. Works specifically on "
+"the single post pages. Uses Mootools 1.4 javascript."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Daiv Mowbray"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://www.daivmowbray.com"
+msgstr ""
